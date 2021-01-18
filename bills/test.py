@@ -1,5 +1,6 @@
 from decimal import Decimal
-from django.test import TestCase
+from django.test import TestCase, Client
+from django.urls import reverse
 
 from django.contrib.auth.models import User
 from accounts.models import Account, AccountEntityType, AccountEntityFinancial
@@ -13,7 +14,7 @@ class TestBillModel(TestCase):
         self.user = User.objects.create_user(
             email='test@gmail.com',
             username='testuser',
-            password='12345123'
+            password='123456789'
         )
 
         self.accountEntityType = AccountEntityType.objects.create(
@@ -113,3 +114,60 @@ class TestBillModel(TestCase):
         self.assertEqual(fund.current_balance, 8500)
         self.assertEqual(fund.output_balance, 1500)
         self.assertEqual(fund.input_balance, 0)
+
+
+class TestCreateBillByUser(TestBillModel):
+
+    def setUp(self):
+        super(TestCreateBillByUser, self).setUp()
+        self.client = Client()
+
+    def testWhenUserIsNotLogin(self):
+        response = self.client.get(
+            reverse('bills_by_account', kwargs={'account_id': self.account.id})
+        )
+
+        self.assertGreater(response.status_code, 300)
+        self.assertRedirects(
+            response,
+            f'/login?login_url=/dashboard/cuentas/1/bills/',
+            target_status_code=301
+        )
+
+    def testCreateBillOnInvalidAccount(self):
+        secondaryUser = User.objects.create_user(
+            email='user2@gmail.com',
+            password='123456789',
+            username='test2@gmail.com'
+        )
+        self.client.login(username=secondaryUser.username, password='123456789')
+
+        response = self.client.get(
+            reverse('register_bill', kwargs={'account_id': self.account.id})
+        )
+
+        self.assertContains(response, '401 Unhautorized', status_code=401)
+
+    def testUserCreteBill(self):
+        self.client.login(username=self.user.username, password='123456789')
+        fund = self.account.account_funds.first()
+        fund.current_balance = 10000
+        fund.save()
+
+        response = self.client.post(
+            reverse('register_bill', kwargs={'account_id': self.account.id}),
+            {'bill_number': '000001',
+             'emit_date': '2020-01-18', 'pay_from_fund': fund.id,
+             'subtotal': 1400, 'iva': 100, 'total': 1500}
+        )
+
+        bills = Bill.objects.all()
+        fund = self.account.account_funds.first()
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(
+            response,
+            reverse('user_accounts')
+        )
+        self.assertEqual(fund.current_balance, 8500)
+        self.assertEqual(len(bills), 1)

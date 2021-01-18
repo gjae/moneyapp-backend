@@ -1,13 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView
 
 from accounts.models import Account
-from movements.models import AccountFunds
-from .models import Bill
 from .forms import RegisterBillForm
+from .models import Bill
 
 
 # Create your views here.
@@ -44,16 +43,26 @@ class RegisterBill(LoginRequiredMixin, CreateView):
     form_class = RegisterBillForm
     account = None
 
+    def get(self, *args, **kwargs):
+        user = self.request.user
+        self.account = Account.objects.get(pk=kwargs['account_id'])
+
+        if self.account.owner.id != user.id:
+            messages.error(self.request, 'No tiene permiso para realizar esta accion')
+            return HttpResponse('401 Unhautorized', status=401);
+
+        return super(RegisterBill, self).get(*args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super(RegisterBill, self).get_context_data(**kwargs)
         user = self.request.user
         self.account = Account.objects.get(pk=self.kwargs['account_id'])
 
-        if self.account.owner.id != user.id:
-            messages.error(self.request, 'No tiene permiso para realizar esta accion')
-            return HttpResponseRedirect(reverse('user_accounts'), status=401)
-
         context['account'] = self.account
-        context['funds'] = self.account.account_funds.all()
+
+        if self.account.account_funds is not None:
+            context['funds'] = self.account.account_funds.all()
+        else:
+            context['funds'] = []
 
         return context
