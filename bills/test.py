@@ -93,7 +93,7 @@ class TestBillModel(TestCase):
         )
 
         movements = Movement.objects.all()
-        self.assertGreater(len(movements), 0)
+        self.assertEqual(len(movements), 1)
 
     def testWhenBillIsCreatedThenTheFundHasLessBalance(self):
         fund = self.account.account_funds.first()
@@ -112,3 +112,4 @@ class TestBillModel(TestCase):
 
         self.assertEqual(fund.current_balance, 8500)
         self.assertEqual(fund.output_balance, 1500)
+        self.assertEqual(fund.input_balance, 0)

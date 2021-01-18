@@ -36,6 +36,10 @@ def new_movement_is_created(sender, instance=None, raw=False, *arg, **kwargs):
             )
         from_fund.subToBalance(instance.amount)
 
+    # Si los fondos de recepción (to_fund [campo funding del modelo Movement])
+    # esta como null, entonces probablemente esta entrando un gasto
+    # en ese caso entonces la variable from_funding (campo from_account_funds del modelo Movement)
+    # no puede ser null
     if to_fund is not None:
         instance.amount_before_transaction = to_fund.current_balance
         instance.amount_after_transaction = to_fund.current_balance + instance.amount
