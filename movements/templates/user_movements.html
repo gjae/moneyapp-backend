@@ -1,0 +1,158 @@
+{% extends 'layouts/dashboard_base_layout.html' %}
+{% load static %}
+{% block title %} Movimientos de cuenta {% endblock title %}
+{% block site_title %}
+   Estado de cuenta: {{ account }}
+{% endblock site_title %}
+
+{% block content %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12 col-md-4 col-lg-4">
+                <div class="small-box bg-info">
+                  <div class="inner">
+                    <h3>{{ balances.current_balance }}</h3>
+                    <p>Total disponible</p>
+                  </div>
+                  <div class="icon">
+                    <i class="fas fa-landmark"></i>
+                  </div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-4 col-lg-4">
+                <div class="small-box bg-danger">
+                  <div class="inner">
+                    <h3>{{ balances.spent }}</h3>
+                    <p>Total gastado</p>
+                  </div>
+                  <div class="icon">
+                    <i class="fas fa-receipt"></i>
+                  </div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-4 col-lg-4">
+                <div class="small-box bg-success">
+                  <div class="inner">
+                    <h3>{{ balances.joined }}</h3>
+                    <p>Total ingresado/recibido</p>
+                  </div>
+                  <div class="icon">
+                    <i class="fas fa-donate"></i>
+                  </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-default">
+                  <div class="card-header">
+                    <h3 class="card-title">
+                      <i class="fas fa-bullhorn"></i>
+                      Movimientos de tu cuenta
+                    </h3>
+                  </div>
+                  <!-- /.card-header -->
+                  <div class="card-body">
+                      <div class="row">
+                          {% if messages %}
+                            {% for message in messages %}
+                                {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+                                    <div class="col-12">
+                                        <div class="alert alert-success">
+                                            {{ message }}
+                                        </div>
+                                    </div>
+                                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+                                      <div class="col-12">
+                                          <div class="alert alert-success">{{ message }}</div>
+                                      </div>
+                                {% endif %}
+                            {% endfor %}
+                          {% endif %}
+                          <div class="col-12 text-right mb-3">
+                              <a href="{% url 'user_accounts_create' %}" class="btn btn-primary">
+                                  <i class="fas fa-hand-holding-usd"></i> Transferir
+                              </a>
+                              <a href="{% url 'new_deposit' account.id %}" class="btn btn-primary">
+                                  <i class="fas fa-donate"></i> Deposito
+                              </a>
+                          </div>
+                          <div class="col-12">
+                            <table id="movements_table" class="table table-bordered table-hover">
+                              <thead>
+                                  <tr>
+                                    <th>ID</th>
+                                    <th>Fecha</th>
+                                    <th>Tipo de movimiento</th>
+                                    <th>Monto</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                {% for movimiento in movimientos %}
+                                    <tr>
+                                        <td>{{ movimiento.transaction_id }}</td>
+                                        <td>{{ movimiento.movement_date_register }}</td>
+                                        <td>
+                                            <div class="alert alert-{% if movimiento.movement_type == 'Recibido' %} success {% else %} danger {% endif %}">
+                                                {{ movimiento.movement_type }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {{ movimiento.amount }}
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center">
+                                            <strong>
+                                                Sin movimientos registrados
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                          </div>
+                      </div>
+                  </div>
+                  <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+              </div>
+              <!-- /.col -->
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/jszip/jszip.min.js' %}"></script>
+<script src="{% static 'plugins/pdfmake/vfs_fonts.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+<!-- Page specific script -->
+<script>
+  $(document).ready(function() {
+        $('#movements_table').DataTable({
+          "paging": true,
+          "lengthChange": false,
+          "searching": false,
+          "ordering": true,
+          "info": true,
+          "autoWidth": false,
+          "responsive": true,
+        });
+  })
+
+</script>
+{% endblock scripts %}

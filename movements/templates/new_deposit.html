@@ -1,0 +1,79 @@
+{% extends 'layouts/dashboard_base_layout.html' %}
+
+{% block title %} Nuevo deposito {% endblock title %}
+{% block site_title %} Nuevo deposito {% endblock site_title %}
+
+{% block content %}
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-default">
+                    <div class="card card-header">
+                        <h3 class="card-title">
+                          <i class="fas fa-bullhorn"></i>
+                          Los depositos son marcados como ingresos
+                        </h3>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="container">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="form-row">
+                                    <div class="col-sm-12 col-md-3 col-lg-3 ">
+                                        <label for="id_amount">Monto</label>
+                                        <input placeholder="Monto" required
+                                               type="number" name="amount" id="id_amount" class="form-control">
+                                    </div>
+                                    <div class="col-sm-12 col-md-3 col-lg-3">
+                                        <label for="id_transaction_id">Cod. de transacción</label>
+                                        <input type="text"
+                                               maxlength="12" min="3"
+                                               required class="form-control"
+                                               name="transaction_id"
+                                               id="id_transaction_id">
+                                    </div>
+                                    <div class="col-sm-12 col-md-3 col-lg-3">
+                                        <label for="id_movement_date_register">
+                                            Fecha de la transacción
+                                        </label>
+                                        <input type="datetime-local" name="movement_date_register" id="id_movement_date_register"
+                                               class="form-control">
+                                    </div>
+                                    <div class="col-sm-12 col-md-3 col-lg-3">
+                                        <label for="id_funding">
+                                            Fondo de reposo
+                                        </label>
+                                        <select name="funding" id="id_funding" required class="form-control">
+                                        {% for fund in account_funds %}
+                                            <option value="{{ fund.id }}">{{ fund }}</option>
+                                        {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-12">
+                                        <label for="id_description">Breve descripción de la transacción</label>
+                                        <textarea name="description" id="id_description" cols="30" rows="3"
+                                                  class="form-control"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row mt-2">
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-success btn-block">
+                                            Guardar
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

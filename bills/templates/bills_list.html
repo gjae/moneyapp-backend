@@ -1,0 +1,90 @@
+{% extends 'layouts/dashboard_base_layout.html' %}
+{% load static %}
+
+{% block title %} Facutras registradas en la cuenta {{ account }} {% endblock title %}
+{% block site_title %} Facturas registradas {% endblock site_title %}
+
+{% block content %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-default">
+                    <div class="card-header">
+                        <i class="fas fa-file-invoice-dollar"></i> Facturas
+                    </div>
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-12 text-right">
+                                    <a href="{% url 'register_bill' account.id  %}" class="btn btn-success mb-2">
+                                        Registrar factura
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="table-responsive">
+                            <table class="table table-stripped" id="bills-table">
+                                <thead>
+                                    <tr>
+                                        <th>N. de factura</th>
+                                        <th>Fecha de registro</th>
+                                        <th>Cuenta de pago</th>
+                                        <th align="right">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for bill in bills  %}
+                                       <tr>
+                                           <td>{{ bill.bill_number }}</td>
+                                           <td>{{ bill.emit_date }}</td>
+                                           <td>{{ bill.pay_from_fund }}</td>
+                                           <td align="right">{{ bill.total }}</td>
+                                       </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="4" align="center">
+                                                <strong>No hay facturas registradas</strong>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/jszip/jszip.min.js' %}"></script>
+<script src="{% static 'plugins/pdfmake/vfs_fonts.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+<!-- Page specific script -->
+<script>
+  $(function () {
+    $('#bills-table').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
+    });
+  });
+</script>
+{% endblock scripts %}

@@ -1,0 +1,96 @@
+{% extends 'layouts/dashboard_base_layout.html' %}
+{% load static %}
+
+{% block title %} Registrar factura a la cuenta... {{ account }} {% endblock title %}
+{% block site_title %} Ingresar factura {% endblock site_title %}
+
+{% block content %}
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="card card-default">
+            <div class="card-header">
+                Datos de la factura
+            </div>
+            <div class="card-body">
+                <form action="" method="post">
+                    {% csrf_token %}
+                    {% if form.errors %}
+                    <div class="row">
+                        <div class="col-12 alert alert-danger">
+                            {{ form.non_field_errors.0 }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="form-row">
+                        <div class="col-sm-12 col-md-6">
+                            <label for="id_bill_number">
+                                Número de factura o nota de entrega
+                            </label>
+                            <input type="text" class="form-control {% if form.bill_number.errors %} is-invalid {% endif %}" id="id_bill_number" name="bill_number"
+                                   placeholder="Numero de factura o recibo">
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            <label for="id_emit_date">Fecha de emisión</label>
+                            <input type="date" name="emit_date" id="id_emit_date" class="form-control {% if form.emit_date.errors %} is-invalid {% endif %}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-12 justify">
+                            <hr>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong>
+                                    Gastado de...
+                                </strong>
+                                <span>
+                                    <select required name="pay_from_fund" id="id_pay_from_fund" class="form-control {% if form.pay_from_fund.errors %} is-invalid {% endif %}">
+                                        <option selected>------ ELIJA UNA OPCION ------</option>
+                                        {% for fund in funds %}
+                                            <option value="{{ fund.id }}">
+                                                {{ fund }} ({{ fund.current_balance }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </span>
+                            </div>
+                            <hr>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-12">
+                            <hr>
+                            <strong>
+                                Totalización
+                            </strong>
+                            <hr>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-sm-12 col-md-4">
+                            <label for="id_subtotal">Subtotal</label>
+                            <input type="number" required name="subtotal" id="id_subtotal" step=".01"
+                                   placeholder="subtotal de la factura" class="form-control">
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <label for="id_iva">Total IVA</label>
+                            <input type="number" required name="iva" id="id_iva" step=".01" placeholder="Total de iva"
+                                   class="form-control">
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <label for="id_total">Total</label>
+                            <input type="number" required name="total" id="id_total" step=".01" placeholder="Total de la factura"
+                                   class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-row mt-2">
+                        <div class="col-12 d-flex flex-row justify-content-end">
+                            <button type="submit" class="btn btn-success block">Guardar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,102 @@
+{% extends 'layouts/dashboard_base_layout.html' %}
+{% load static %}
+{% block title %} Fondos del usuario {% endblock title %}
+{% block site_title %} Fondos de cuentas {% endblock site_title %}
+
+{% block content %}
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-default px-3">
+                    <div class="card-header">
+                        <h3 class="card-title">Fondos por banco</h3>
+                    </div>
+                    <span class="mt-3"></span>
+                    {% if messages %}
+                        {% for message in messages %}
+                            {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+                                <div class="alert alert-success">
+                                    {{ message }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                    <div class="row">
+                        <div class="col-12 text-right">
+                            <a href="{% url 'funds_form_create' %}" class="btn btn-success">Crear fondo</a>
+                        </div>
+                    </div>
+                    <div class="card-row mt-3">
+                        <table class="table-striped table" id="funds_table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Descripción</th>
+                                    <th align="right">Gastado</th>
+                                    <th align="right">Ingresado</th>
+                                    <th align="right">Disponibilidad</th>
+                                    <th align="left">Aciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for fund in funds %}
+                                    <tr>
+                                        <td>{{ fund.id }}</td>
+                                        <td>{{ fund.fund_description }}</td>
+                                        <td align="right">{{ fund.output_balance }}</td>
+                                        <td align="right">{{ fund.input_balance }}</td>
+                                        <td align="right">{{ fund.current_balance }}</td>
+                                        <td></td>
+                                    </tr>
+
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center">
+                                            <strong>
+                                                Sin registros disponibles
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/jszip/jszip.min.js' %}"></script>
+<script src="{% static 'plugins/pdfmake/vfs_fonts.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+<!-- Page specific script -->
+<script>
+  $(document).ready(function() {
+        $('#funds_table').DataTable({
+          "paging": true,
+          "lengthChange": false,
+          "searching": false,
+          "ordering": true,
+          "info": true,
+          "autoWidth": false,
+          "responsive": true,
+        });
+  })
+
+</script>
+{% endblock scripts %}

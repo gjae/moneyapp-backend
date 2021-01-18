@@ -1,0 +1,120 @@
+{% extends 'layouts/dashboard_base_layout.html' %}
+{% load static %}
+{% block title %} Cuentas registradas {% endblock title %}
+{% block site_title %} Cuentas registradas {% endblock site_title %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-default">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="fas fa-bullhorn"></i>
+              Cuentas registradas
+            </h3>
+          </div>
+          <!-- /.card-header -->
+          <div class="card-body">
+              <div class="row">
+                  {% if messages %}
+                    {% for message in messages %}
+                        {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+                            <div class="col-12">
+                                <div class="alert alert-success">
+                                    {{ message }}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                  {% endif %}
+                  <div class="col-12 text-right mb-3">
+                      <a href="{% url 'user_accounts_create' %}" class="btn btn-primary">Registrar cuenta</a>
+                  </div>
+                  <div class="col-12">
+                    <table id="accountTable" class="table table-bordered table-hover">
+                      <thead>
+                          <tr>
+                            <th>Tipo de cuenta</th>
+                            <th>Entidad</th>
+                            <th>Número</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                        {% for account in accounts %}
+                            <tr>
+                                <td>{{ account.accountTypeDescription }}</td>
+                                <td>{{ account.entity }}</td>
+                                <td>{{ account.fullAccountCode }}</td>
+                                <td>Activa</td>
+                                <td>
+                                    <form action="{% url 'user_account_delete' account.id %}"  acc-id="{{ account.id }}"  class="del-form" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" acc-id="{{ account.id }}" class="btn btn-danger delete-btn">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        <a href="{% url 'edit' pk=account.id %}" class="btn btn-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'account_user_movements' account.id %}" class="btn btn-success">
+                                            <i class="fas fa-people-arrows"></i>
+                                        </a>
+                                        <a href="{% url 'bills_by_account' account.id %}" class="btn btn-danger">
+                                            <i class="fas fa-file-invoice-dollar"></i>
+                                        </a>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                  </div>
+              </div>
+          </div>
+          <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+      </div>
+      <!-- /.col -->
+    </div>
+</div>
+{% endblock content %}
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/jszip/jszip.min.js' %}"></script>
+<script src="{% static 'plugins/pdfmake/vfs_fonts.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+<!-- Page specific script -->
+<script>
+  $(document).ready(function() {
+
+    $(".del-form").on('submit', function(e) {
+           console.log(e, e.target.getAttribute('acc-id'))
+        if (!confirm('¿Seguro que desea eliminar este registro?')) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    })
+  })
+  $(function () {
+    $('#accountTable').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
+    });
+  });
+</script>
+{% endblock scripts %}
