@@ -31,6 +31,7 @@
                                         <th>Fecha de registro</th>
                                         <th>Cuenta de pago</th>
                                         <th align="right">Total</th>
+                                        <th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -40,10 +41,18 @@
                                            <td>{{ bill.emit_date }}</td>
                                            <td>{{ bill.pay_from_fund }}</td>
                                            <td align="right">{{ bill.total }}</td>
+                                           <td>
+                                               <form action="{% url 'nulled_bill' account.id bill.id %}" method="post">
+                                                   {% csrf_token %}
+                                                   <button type="submit" class="btn btn-danger">
+                                                       <i class="fas fa-trash"></i>
+                                                   </button>
+                                               </form>
+                                           </td>
                                        </tr>
                                         {% empty %}
                                         <tr>
-                                            <td colspan="4" align="center">
+                                            <td colspan="5" align="center">
                                                 <strong>No hay facturas registradas</strong>
                                             </td>
                                         </tr>

@@ -171,3 +171,53 @@ class TestCreateBillByUser(TestBillModel):
         )
         self.assertEqual(fund.current_balance, 8500)
         self.assertEqual(len(bills), 1)
+
+    def testIntentNulledBillsThatNotIsOwnOfUser(self):
+        fund = self.account.account_funds.first();
+        fund.current_balance = 10000
+        bill = Bill.objects.create(
+            bill_number='00290012312',
+            subtotal=Decimal(1400),
+            iva=Decimal(100.00),
+            total=Decimal(1500.00),
+            pay_from_fund=fund
+        )
+
+        secondaryUser = User.objects.create_user(
+            email = 'test2@djangotest.com',
+            username='testuser2',
+            password='123456789'
+        )
+
+        self.client.login(username=secondaryUser.username, password='123456789')
+        response = self.client.post(
+            reverse('nulled_bill', kwargs={'account_id': self.account.id, 'bill_id': bill.id})
+        )
+
+        self.assertContains(response, '401 Unauthorized', status_code=401)
+
+    def testWhenBillIsNulledThenAccountReplenishTheTotalOfSpend(self):
+        self.client.login(username=self.user.username, password='123456789')
+        fund = self.account.account_funds.first()
+        fund.current_balance = 10000
+
+        bill = Bill.objects.create(
+            bill_number='00290012312',
+            subtotal=Decimal(1400),
+            iva=Decimal(100.00),
+            total=Decimal(1500.00),
+            pay_from_fund=fund
+        )
+
+        response = self.client.post(
+            reverse('nulled_bill', kwargs={'account_id': self.account.id, 'bill_id': bill.id})
+        )
+
+        bill = Bill.objects.get(pk=bill.id)
+        fund = AccountFunds.objects.get(pk=fund.id)
+        movements = Movement.objects.all()
+
+        self.assertIsNotNone(bill.bill_nulled_at)
+        self.assertEqual(fund.current_balance, 10000)
+        self.assertEqual(len(movements), 2)
+        self.assertEqual(movements[1].funding, fund)
