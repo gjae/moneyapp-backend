@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'accounts',
     'usermanagement',
     "movements.apps.MovementsConfig",
-    'bills.apps.BillsConfig'
+    'bills.apps.BillsConfig',
+    'remittances'
 ]
 
 MIDDLEWARE = [
