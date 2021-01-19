@@ -74,7 +74,7 @@ class ScrapperResponse:
         return text.strip()
 
     def prettyOut(self):
-        self.soup.prettify()
+        return self.soup.prettify()
 
     def parseMethodUsingCamelcase(self, string, glue="-"):
         matches = re.findall('[A-Z][^A-Z]*', string)
@@ -104,7 +104,7 @@ class Scrapper:
     def getClassResponse(self):
         return self.class_response
 
-    def requestToUr(self, url:str) -> ScrapperResponse:
+    def requestToUrl(self, url:str) -> ScrapperResponse:
         """
         Genera el request a la url indicada en el parametro :url
 
@@ -122,7 +122,7 @@ class Scrapper:
 
     def getUrlRequest(self):
         for url in self.urls_scrappers:
-            yield self.requestToUr(url)
+            yield self.requestToUrl(url)
 
     def getFirstRequestResult(self) -> ScrapperResponse:
         """
@@ -131,6 +131,6 @@ class Scrapper:
         :return:
         """
         for index in range(len(self.urls_scrappers)):
-            return self.requestToUr(self.urls_scrappers[index])
+            return self.requestToUrl(self.urls_scrappers[index])
 
         return None
