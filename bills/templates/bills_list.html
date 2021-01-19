@@ -42,12 +42,14 @@
                                            <td>{{ bill.pay_from_fund }}</td>
                                            <td align="right">{{ bill.total }}</td>
                                            <td>
+                                               {% if bill.bill_nulled_at == None %}
                                                <form action="{% url 'nulled_bill' account.id bill.id %}" method="post">
                                                    {% csrf_token %}
                                                    <button type="submit" class="btn btn-danger">
                                                        <i class="fas fa-trash"></i>
                                                    </button>
                                                </form>
+                                               {% endif %}
                                            </td>
                                        </tr>
                                         {% empty %}

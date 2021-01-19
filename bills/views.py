@@ -27,6 +27,11 @@ class NulledBill(View):
         if account.owner.id != request.user.id:
             return HttpResponse('401 Unauthorized', status=401)
 
+        if bill.bill_nulled_at is not None:
+            return HttpResponseRedirect(
+                reverse('bills_by_account', kwargs={'account_id': account.id})
+            )
+
         bill.bill_nulled_at = timezone.make_aware(
             datetime.now(),
             timezone.get_current_timezone(),
