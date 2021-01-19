@@ -3,6 +3,7 @@ from django.db import models
 from movements.models import AccountFunds
 from .managers import BillModelManager
 
+
 # Create your models here.
 
 class Bill(models.Model):
@@ -12,6 +13,7 @@ class Bill(models.Model):
     total = models.DecimalField('Total de la factura', decimal_places=2, max_digits=10)
     pay_from_fund = models.ForeignKey(AccountFunds, on_delete=models.RESTRICT, related_name='account_fund_bills')
     emit_date = models.DateField('Fecha de emision', auto_now=True)
+    bill_nulled_at = models.DateTimeField('Fecha de anulación', null=True, default=None)
 
     objects = BillModelManager()
 

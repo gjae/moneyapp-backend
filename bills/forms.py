@@ -7,6 +7,7 @@ class RegisterBillForm(forms.ModelForm):
     class Meta:
         model = Bill
         fields = '__all__'
+        exclude = ['bill_nulled_at', ]
 
     def clean(self):
         cleaned_data = super(RegisterBillForm, self).clean()
